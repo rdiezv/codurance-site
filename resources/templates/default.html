@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+<title>
+{% block pagename %} Software Craftsmanship and Agile Development {% endblock %} 
+| Codurance | London</title>
+{% include "templates/head.html" %}
+</head>
+
+<body >
+
+<div class="wrapper">
+<!--=== Header ===-->
+{% include "templates/header.html" %}
+<!--=== End Header ===-->
+
+{% block content %} Content to override {% endblock %}
+
+<!--=== Copyright ===-->
+{% include "templates/footer.html" %}
+<!--=== End Copyright ===-->
+</div>
+
+{% include "templates/foot.html" %}
+</body>
+</html>
