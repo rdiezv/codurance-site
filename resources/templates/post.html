@@ -11,7 +11,7 @@
         <div class="news-v3-in shareThisButtons">
           <h1>{{ page.title }}</h1>
           <ul class="list-inline posted-info">
-              <li>By {{ page.author }}</li>
+              <li>By {{ page.author.name }}</li>
               {% if page.date %}
                 <li>Posted: {{ page.date|date:"d MMM yyyy"}}</li>
                 <li>
@@ -57,7 +57,7 @@
                     </ul>
                     {% endif %}
                   </div>
-                  <p>{{ page.author.fullDescription }}</p>
+                  <p>{% safe %} {{ page.author.fullDescription }} {% endsafe %}</p>
                 </div>
               </div>
             </div>
