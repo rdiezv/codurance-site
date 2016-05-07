@@ -5,6 +5,7 @@
                [clj-time.format :refer [formatter parse]]
                [site.authors :refer [get-author]]))
 
+(def rendered-posts (atom {}))
 (def date-format (formatter "yyyy-MM-dd HH:mm:SS Z"))
 
 (defn- extract-metadata-value [k v] 
@@ -19,16 +20,30 @@
 (defn- add-author [m]
   (assoc m :author (get-author (:author m))))
 
-(defn- get-metadata [post]
- (add-author (extract-from-lists (:metadata post))))
+(defn- process-metadata [metadata]
+ (add-author (extract-from-lists metadata)))
 
-(defn- render-post [md-content]
-  (let [c (md-to-html-string-with-meta md-content)
-        m (get-metadata c) h (:html c)]
-      
-    [(str "/blog/" (:name m) "/") 
-     (render-file "templates/post.html" {:page m :content (:html c)})]))
+(defn- to-html-with-metadata [md-content]
+  (let [{:keys [metadata html]} (md-to-html-string-with-meta md-content)]
+    [(add-author (extract-from-lists metadata)) html]))
 
-(defn get-posts []
-  (let [posts (slurp-directory "./resources/posts/" #".*\.md")]
-    (into {} (for [[_ md-content] posts] (render-post md-content))))) 
+(defn- to-html [ps]
+  (into {} 
+        (for [v (vals ps) ] 
+          (let [ [metadata html] (to-html-with-metadata v)]
+            [(str "/blog/" (:name metadata) "/") {:page metadata :content html}])   )))
+
+(defn- render-page [post]
+  (render-file "templates/post.html" post))
+
+(defn- latest-posts [post-path posts]
+  (map #(nth % 1) (take 7 (filter (fn [[k v]] (not= k post-path)) posts))))
+
+(defn- add-site-details [posts]
+  (into {} (for [[k v] posts] [k (assoc v :site {:posts (latest-posts k posts)  })])))
+
+(defn render-posts []
+  (let [posts (to-html (slurp-directory "./resources/posts/" #".*\.md")) 
+        site-posts (add-site-details posts) ]
+    (reset! rendered-posts 
+            (into {} (for [[path content] site-posts] [path (render-page content)] ))))) 

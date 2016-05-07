@@ -31,13 +31,13 @@
          (assets/load-assets "public" [#"/assets/.*\.css"])
          (assets/load-assets "public" [#"/assets/.*\.js"])))
 
-(defn get-pages  []
+(defn render-pages  []
   (let [f (clojure.java.io/file "resources/site")
         paths (map #(subs % 14) (map #(.getPath %) (filter #(.isFile %) (file-seq f))))]
     
     (into {} (for [p paths] [p (render-file (str "site" p) {})])))) 
 
-(defn get-all-pages [] (concat (get-pages) (p/get-posts)))
+(defn get-all-pages [] (concat (render-pages) (p/render-posts)))
 
 (def optimize optimizations/all)
 
